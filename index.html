@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ramon.g-bot</title>
+  <style>
+    body {
+      user-select: none;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5 url('bg.png') no-repeat center center/cover;
+      transition: filter 0.3s ease;
+    }
+
+    body.blur-bg::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px);
+      z-index: -1;
+    }
+
+    #admin-profile {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 50px;
+      height: 50px;
+      border-radius: 5%;
+      overflow: hidden;
+      border: 1px solid #ccc;
+    }
+
+    #admin-profile img {
+      width: 80%;
+      height: auto;
+      display: block;
+    }
+
+    form input {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 80%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      background: #007bff;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .photo-container {
+      margin: 20px auto;
+      width: 200px;
+      height: 200px;
+      border: 2px solid #ccc;
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    #lyrics {
+      margin-top: 20px;
+      font-size: 18px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      width: 80%;
+      max-width: 600px;
+      margin: 20px auto;
+      border-radius: 5px;
+      display: none;
+      overflow: hidden;
+      text-align: left;
+    }
+
+    #repeat-button {
+      display: none;
+      margin: 20px auto;
+      padding: 15px;
+      font-size: 24px;
+      color: white;
+      background: #007bff;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+    }
+
+    #repeat-button:hover {
+      background: #0056b3;
+    }
+
+    .logo {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #fff;
+    border-radius: 50%;
+    padding: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease-in-out;
+}
+
+.logo:hover {
+    transform: rotate(360deg);
+}
+
+/* Gaya teks yang muncul */
+.message {
+    display: none;
+    position: fixed;
+    bottom: 50px;
+    right: 65px;
+    background-color: #f0f0f0; /* Abu-abu putih */
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    max-width: 200px;
+    text-align: center;
+    transition: opacity 0.5s ease-in-out;
+}
+  </style>
+</head>
+<body>
+  <div id="admin-profile">
+    <img src="propil.jpg" alt="Admin">
+  </div>
+
+  <div id="main-section">
+    <h1>klik</h1>
+    <h4>👇🏻</h4>
+    <input type="file" id="upload-photo" accept="image/*">
+    <div id="photo-preview" class="photo-container"></div>
+    <div id="control-buttons" style="display: none;">
+      <button id="play-woman">Perempuan</button>
+      <button id="play-man">Laki-Laki</button>
+    </div>
+
+    <div id="logo" class="logo">
+        💌
+    </div>
+
+    <!-- Teks yang tampil ketika tombol diklik -->
+    <div id="message" class="message">
+       ®<br> ini adalah codingan sederhana yang di buat oleh kegabutan saya pribadi |  eitsss iya ini  hanya untuk kesenanggan pribadi,dan untuk mengasah penggetahuan saja tidak lebih,tidak ada maksud dan tujuan lebih!!!!<br><br>I<br><br>L<br>O<br>V<br>E<br><br>Y<br>O<br>U<br>🫶🏻
+    </div>
+
+    <audio id="bg-music-woman" src="musik.mp3"></audio>
+    <audio id="bg-music-man" src="musik2.mp3"></audio>
+    <div id="lyrics"></div>
+    <button id="repeat-button">🔂</button>
+  </div>
+
+  <script>
+    const uploadPhoto = document.getElementById("upload-photo");
+    const photoPreview = document.getElementById("photo-preview");
+    const playWoman = document.getElementById("play-woman");
+    const playMan = document.getElementById("play-man");
+    const bgMusicWoman = document.getElementById("bg-music-woman");
+    const bgMusicMan = document.getElementById("bg-music-man");
+    const lyricsElement = document.getElementById("lyrics");
+    const repeatButton = document.getElementById("repeat-button");
+    const controlButtons = document.getElementById("control-buttons");
+
+    const lyricsWoman = [
+      { time: 4, text: "sebelum tahun ini berakhir....." },
+      { time: 6, text: "sebenarnya Aku pengen banget bikin kamu bahagia...." },
+      { time: 10, text: "tapi Aku sadar..." },
+      { time: 11, text: "kelakuan aku saja...." },
+      { time: 13, text: "sering bikin mood kamu rusak...." },
+      { time: 15, text: "namun intinya :)...." },
+      { time: 17, text: "Aku ingin berterima kasih dan meminta maaf kepadamu...." },
+      { time: 20, text: "terima kasih.... " },
+      { time: 21, text: "sudah selalu ada...." },
+      { time: 23, text: "sudah selalu mencintaiku..." },
+      { time: 24, text: "dan sudah selalu menghargai ku...." },
+      { time: 27, text: "dan maaf ya...." },
+      { time: 28, text: "jika selama ini....." },
+      { time: 29, text: "Aku belum berhasil menjadi seseorang yang sangat kamu.." },
+      { time: 31, text: "kamu inggin kan.." },
+      { time: 34, text: "tapi jujur dari hatiku yang paling dalam...." },
+      { time: 37, text: "cuma kamu satu-satunya perempuan...." },
+      { time: 40, text: "yang berhasil membuat Aku tidak merasa sendirian lagi....." },
+      { time: 44, text: "kamu satu-satunya perempuan...." },
+      { time: 46, text: "yang berhasil membuat Aku merasa sangat dicintai.." },
+      { time: 48, text: "dan dirayakan....." },
+      { time: 52, text: "namun sebelum itu...." },
+      { time: 54, text: "bolehkah Aku meminta satu hal..." },
+      { time: 57, text: "mau kah kamu..." },
+      { time: 58, text: "menjadi satu-satunya perempuan...." },
+      { time: 60, text: "yang paling Aku sayang di hatiku..." },
+      { time: 62, text: "setelah ibuku :) !!!!" },
+      { time: 64, text: "GANTI VIBESSS AH XIXIX -:Detik-detik menuju pergantian tahun terasa begitu cepat. Di luar, kembang api mulai meledak, tapi hatiku dipenuhi berbagai perasaan yang tak mudah diungkapkan.Ada kamu, orang yang selalu ada untukku dengan cara yang tak aku sangka..... 'شكراً لأنك كنت دائمًا موجودًا من أجلي' (Shukran li'annaka kunt da'iman mawjudan min ajli) — Terima kasih telah selalu ada untukku, mendukungku secara diam-diam, dengan cara yang mungkin tak pernah aku pahami.Lalu ada dia, orang yang ku suka tapi selalu biasa saja, dan kadang terasa jauh..... 'أنت تعرف أنك مهم بالنسبة لي' (Anta ta'raf annaka muhim li'andi) — Kamu tahu bahwa kamu berarti untukku.....Tapi yang paling berat adalah orang yang ku cinta, yang tak bisa kumiliki.... 'لا أستطيع الوصول إليك' (La astati'u al-wusul ilayk) — Aku tak bisa meraihmu.Tahun baru hampir tiba, dan aku hanya bisa berharap..... 'ربما في العام القادم، كل شيء سيتغير' (Rubama fi al-'am al-qadim, kulla shay'in sayataghayyar) — Mungkin di tahun depan, semuanya akan berubah....<hope>semoga nanti bisa memiliki mu </enough>...." },
+    ];
+
+    const lyricsMan = [
+      { time: 0, text: "sebelum tahun 2024 berakhir,aku inggin mengucapkan...!!!!" },
+      { time: 3, text: "terima kaaaaaaaaasih monyettt🐒🙈🙉..." },
+      { time: 4, text: "kau lahhhhhhhhhhhhhhhhhhhhhhh sahabatttttttttttt..." },
+      { time: 6, text: "sejatiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii................" },
+      { time: 10, text: "⚠️TIDAK UNTUK LAKI LAKI ---ahakahskahskshslahalshslahakahakahk awokawokawokawok monyettttt 🐒🙈-🙉_🙈-🙉_🙈-🙉_🙈-🙉_🙈-🙉 ⚠!!!!!!!!!!" },
+      { time:10, text: "jika tombol ' 🔁 ' tidak muncul.anda harus pilih poto lagi untuk mengulang atau refres browser anda!" },
+    ];
+
+    let currentLyricIndex = 0;
+    let currentLyrics = [];
+    let currentMusic;
+
+    uploadPhoto.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          document.body.style.backgroundImage = `url(${event.target.result})`;
+          document.body.classList.add("blur-bg");
+          photoPreview.style.backgroundImage = `url(${event.target.result})`;
+          controlButtons.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    playWoman.addEventListener("click", () => {
+      playMusic(bgMusicWoman, lyricsWoman);
+    });
+
+    playMan.addEventListener("click", () => {
+      playMusic(bgMusicMan, lyricsMan);
+    });
+
+    repeatButton.addEventListener("click", resetApp);
+
+    function playMusic(music, lyrics) {
+      resetLyrics();
+      currentLyrics = lyrics;
+      currentMusic = music;
+      controlButtons.style.display = "none";
+      music.play();
+      lyricsElement.style.display = "block";
+      showNextLyric(music);
+    }
+
+    function resetLyrics() {
+      currentLyricIndex = 0;
+      lyricsElement.textContent = "";
+    }
+
+    function showNextLyric(music) {
+      const currentTime = music.currentTime;
+      if (currentLyricIndex < currentLyrics.length) {
+        const { time, text } = currentLyrics[currentLyricIndex];
+        if (currentTime >= time) {
+          typeWriterEffect(lyricsElement, text, () => {
+            currentLyricIndex++;
+            showNextLyric(music);
+          });
+        } else {
+          requestAnimationFrame(() => showNextLyric(music));
+        }
+      } else {
+        music.onended = () => {
+          lyricsElement.style.display = "none";
+          repeatButton.style.display = "block";
+        };
+      }
+    }
+
+    function typeWriterEffect(element, text, callback) {
+      element.textContent = "";
+      let index = 0;
+
+      function type() {
+        if (index < text.length) {
+          element.textContent += text.charAt(index);
+          index++;
+          setTimeout(type, 50); // Atur kecepatan mengetik
+        } else {
+          callback();
+        }
+      }
+
+      type();
+    }
+
+    const logo = document.getElementById('logo');
+const message = document.getElementById('message');
+
+// Menambahkan event listener untuk klik pada logo
+logo.addEventListener('click', () => {
+    // Tampilkan teks dengan latar belakang abu-abu putih
+    message.style.display = 'block';
+
+    // Setelah 10 detik, sembunyikan teks
+    setTimeout(() => {
+        message.style.display = 'none';
+    }, 10000); // 10000 ms = 10 detik
+});
+
+    function resetApp() {
+      document.body.style.backgroundImage = "";
+      document.body.classList.remove("blur-bg");
+      photoPreview.style.backgroundImage = "";
+      repeatButton.style.display = "none";
+      controlButtons.style.display = "block";
+    }
+  </script>
+</body>
+</html>
